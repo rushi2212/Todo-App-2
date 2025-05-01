@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Todo List</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Todo List</h1>
+    </header>
+
+    <div class="box">
+        <form method="GET" action="/" class="filter-form">
+            <label for="priority">Filter by Priority:</label>
+            <select name="priority" id="priority" onchange="this.form.submit()">
+                <option <%= selectedPriority === 'All' ? 'selected' : '' %>>All</option>
+                <option <%= selectedPriority === 'High' ? 'selected' : '' %>>High</option>
+                <option <%= selectedPriority === 'Medium' ? 'selected' : '' %>>Medium</option>
+                <option <%= selectedPriority === 'Low' ? 'selected' : '' %>>Low</option>
+            </select>
+        </form>
+
+        <% ejes.forEach(item => { %>
+            <div class="item" data-id="<%= item.id %>">
+                <form action="/toggle" method="POST">
+                    <input type="hidden" name="taskId" value="<%= item.id %>">
+                    <input type="checkbox" class="task-checkbox" <%= item.completed ? 'checked' : '' %> onChange="this.form.submit()">
+                </form>
+
+                <p class="task-text <%= item.completed ? 'completed' : '' %>"><%= item.text %> - <span class="priority"><%= item.priority %></span></p>
+
+                <div class="actions">
+                    <button class="edit-btn">✏️</button>
+                    <form action="/delete" method="POST" class="delete-form">
+                        <input type="hidden" name="taskId" value="<%= item.id %>">
+                        <button type="submit" class="delete-btn">🗑️</button>
+                    </form>
+                </div>
+
+                <div class="edit-container" style="display: none;">
+                    <form action="/edit" method="POST">
+                        <input type="hidden" name="taskId" value="<%= item.id %>">
+                        <input type="text" name="taskText" value="<%= item.text %>">
+                        <button type="submit">Save</button>
+                        <button type="button" class="cancel-btn">Cancel</button>
+                    </form>
+                </div>
+            </div>
+        <% }) %>
+
+        <form action="/add" method="POST" class="add-form">
+            <input type="text" name="ele1" placeholder="Enter a new task" required>
+            <select name="priority" required>
+                <option value="" disabled selected>Priority</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+            </select>
+            <button type="submit">+</button>
+        </form>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Todo App</p>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const item = this.closest('.item');
+                item.querySelector('.task-text').style.display = 'none';
+                item.querySelector('.actions').style.display = 'none';
+                item.querySelector('.edit-container').style.display = 'block';
+            });
+        });
+
+        document.querySelectorAll('.cancel-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const item = this.closest('.item');
+                item.querySelector('.task-text').style.display = 'block';
+                item.querySelector('.actions').style.display = 'flex';
+                item.querySelector('.edit-container').style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
